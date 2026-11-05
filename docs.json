@@ -1,0 +1,67 @@
+{
+  "theme": "default",
+  "appearance": {
+    "contentIcons": "accent"
+  },
+  "markdown": {
+    "enabled": true
+  },
+  "i18n": {
+    "defaultLocale": "en",
+    "locales": [
+      {
+        "code": "en",
+        "label": "English"
+      }
+    ]
+  },
+  "navbar": {
+    "primary": {
+      "label": "Quickstart",
+      "href": "/quickstart"
+    }
+  },
+  "tabs": [
+    {
+      "tab": "Get started",
+      "groups": [
+        {
+          "group": "Get started",
+          "pages": [
+            "introduction",
+            "quickstart"
+          ]
+        }
+      ]
+    },
+    {
+      "tab": "Guides",
+      "groups": [
+        {
+          "group": "Use person-mcp",
+          "pages": [
+            "guides/prep-before-a-call"
+          ]
+        }
+      ]
+    },
+    {
+      "tab": "Reference",
+      "groups": [
+        {
+          "group": "Reference",
+          "pages": [
+            "reference/tools"
+          ]
+        }
+      ]
+    },
+    {
+      "tab": "Changelog",
+      "href": "/changelog"
+    }
+  ],
+  "ai": {
+    "chat": true
+  }
+}

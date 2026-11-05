@@ -1,0 +1,50 @@
+---
+title: Introduction
+description: person-mcp gives your AI agent a memory of the people you meet, stored in a JSON file on your own disk.
+---
+
+person-mcp is an MCP server that remembers people for your AI agent. You read
+a LinkedIn or X profile in your own browser, your agent extracts what you saw,
+and person-mcp stores it. Before a call, an interview or an outreach message,
+your agent asks it what you already know about that person and gets the career
+history, links and every dated note back in one answer.
+
+## Who it is for
+
+You will get the most from person-mcp if you:
+
+- meet a lot of people for work (developer relations, sales, recruiting, job
+  searching) and lose track of what you learned about each one
+- already work with an MCP client such as Claude Code, Cursor or Codex
+- want that memory on your own machine, not in a third-party CRM
+
+## How it works
+
+person-mcp is a small TypeScript server built with
+[mcp-use](https://mcp-use.com). It exposes five tools over HTTP and keeps
+every record in a single `people.json` file next to the server.
+
+| Tool | Kind | What it does |
+| --- | --- | --- |
+| `search-people` | read | Finds contacts by text across name, company, role and notes |
+| `get-person` | read | Returns one contact's full record |
+| `list-tracked` | read | Lists the contacts you flagged to keep an eye on |
+| `import-person` | write | Creates or merges a contact; fields update, notes append |
+| `log-interaction` | write | Adds a dated touchpoint, such as a message sent or a reply |
+
+The server never contacts LinkedIn or X. Import is always started by a person
+who opened the profile normally, so everything person-mcp serves is something
+you chose to keep. The real `people.json` is gitignored, because it holds
+private information about real people.
+
+## Next steps
+
+<Tip>
+  New to person-mcp? Start with the [quickstart](/quickstart). It takes about
+  five minutes and ends with your agent answering a question from the store.
+</Tip>
+
+- [Quickstart](/quickstart): run the server and connect it to Claude Code.
+- [Prepare for a call with person-mcp](/guides/prep-before-a-call): the
+  everyday workflow, with troubleshooting.
+- [Tool reference](/reference/tools): every tool and parameter.

@@ -1,0 +1,140 @@
+---
+title: Prepare for a call with person-mcp
+description: Import a contact from a profile you just read, log each touchpoint, and get a one-message briefing before you talk to them.
+---
+
+This guide walks through the loop person-mcp is built for: you meet someone,
+you keep what matters, and before the next conversation your agent briefs you
+in one message. It assumes the server is running and connected, as in the
+[quickstart](/quickstart).
+
+The examples use a made-up contact, Ada Example. Every response shown below is
+real output from the server.
+
+## 1. Import a contact
+
+Open the person's LinkedIn or X profile in your own browser, then tell your
+agent:
+
+```text
+Import this person. Note that we met at the Madrid MCP meetup.
+```
+
+Your agent extracts the fields and calls `import-person`:
+
+```json
+{
+  "name": "Ada Example",
+  "company": "Example Labs",
+  "role": "Developer Advocate",
+  "notes": ["2026-11-05 met at the Madrid MCP meetup"]
+}
+```
+
+person-mcp creates the record and builds its `id` from the name:
+
+```text
+imported:
+ada-example: Ada Example — Developer Advocate @ Example Labs
+  2026-11-05 met at the Madrid MCP meetup
+```
+
+<Tip>
+  `import-person` stores notes exactly as you pass them. Put the date at the
+  start of each note yourself, or use `log-interaction`, which dates entries
+  for you.
+</Tip>
+
+## 2. Log what happens next
+
+Each time you message them or they reply, log it:
+
+```text
+Log that I sent Ada the demo link.
+```
+
+The agent calls `log-interaction` with the contact's `id` and a `note`. The
+date defaults to today:
+
+```json
+{ "id": "ada-example", "note": "sent the demo link" }
+```
+
+```text
+logged:
+ada-example: Ada Example — Developer Advocate @ Example Labs
+  2026-11-05 met at the Madrid MCP meetup
+  2026-11-05 sent the demo link
+```
+
+## 3. Update a record without losing anything
+
+Importing the same person again merges instead of overwriting. Fields you pass
+are replaced, new notes are appended and duplicate notes are skipped. Here the
+agent flags Ada as someone to keep an eye on:
+
+```json
+{ "name": "Ada Example", "tracked": true, "notes": ["2026-11-06 replied, call booked for Monday"] }
+```
+
+```text
+updated:
+ada-example: Ada Example — Developer Advocate @ Example Labs  [tracked]
+  2026-11-05 met at the Madrid MCP meetup
+  2026-11-05 sent the demo link
+  2026-11-06 replied, call booked for Monday
+```
+
+`list-tracked` now includes her, which is useful for a weekly check of what
+the people you follow have shipped or posted.
+
+## 4. Get briefed before the call
+
+On the morning of the call, ask:
+
+```text
+Prep me for my call with Ada. What do I know, and what did we last talk about?
+```
+
+The agent calls `search-people`, then `get-person`, and has the full history
+in one response: role, company, links and every dated note, in order.
+
+## Troubleshooting
+
+<Accordion title="search-people returns 'no matches' for someone you imported">
+  Search matches your query as one piece of text against the name, company,
+  role and notes. A query like `ada meetup` only matches if those words appear
+  together. Search for one word at a time, such as `ada` or `meetup`. The
+  standing `note` field is not searched; put anything you want to find in
+  `notes`.
+</Accordion>
+
+<Accordion title="The store is empty after you restart the server">
+  person-mcp reads `people.json` from the directory where you run `npm run dev`.
+  If you start it from another folder, it creates an empty store there. Stop
+  the server, `cd` into the person-mcp directory and start it again.
+</Accordion>
+
+<Accordion title="'no contact with id ...' when logging an interaction">
+  `log-interaction` only works on an existing record. Ids are the name in
+  lowercase with accents removed and spaces turned into dashes, so
+  `José Méndez` becomes `jose-mendez`. Run `search-people` to find the exact
+  id, or import the person first.
+</Accordion>
+
+<Accordion title="Port 3000 is already in use">
+  Start the server on another port and point your client at it:
+
+  ```bash
+  npm run dev -- --port 3001
+  claude mcp remove person-mcp
+  claude mcp add person-mcp --transport http http://localhost:3001/mcp --scope user
+  ```
+</Accordion>
+
+<Accordion title="'Input validation error' from a write tool">
+  The tool rejected an argument name or type. `log-interaction` expects
+  `note`, not `entry`, and `import-person` expects `notes` as a list of
+  strings. Check the [tool reference](/reference/tools) for the exact
+  parameters.
+</Accordion>

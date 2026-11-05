@@ -1,0 +1,69 @@
+---
+title: Tool reference
+description: Every person-mcp tool, its parameters and what it returns.
+---
+
+person-mcp exposes five tools at `http://localhost:3000/mcp`. Every tool
+returns plain text, so any MCP client can show the result as is.
+
+A record has these fields: `id`, `name`, `company`, `role`, `linkedin`, `x`,
+`tracked`, `note` (one standing note about who the person is to you) and
+`notes` (a list of dated entries).
+
+## search-people
+
+Read only. Finds contacts whose name, company, role or notes contain the
+query, ignoring case.
+
+| Parameter | Type | Required | Description |
+| --- | --- | --- | --- |
+| `query` | string | yes | Text to match, for example `nvidia` or `recruiter` |
+
+Returns one line per match (`id: name — role @ company`), or `no matches`.
+
+## get-person
+
+Read only. Returns one contact's full record.
+
+| Parameter | Type | Required | Description |
+| --- | --- | --- | --- |
+| `id` | string | yes | The contact's id, as returned by `search-people` |
+
+Returns the record with links and every note, or `no contact with id '<id>'`.
+
+## list-tracked
+
+Read only. Lists every contact with `tracked: true`. Takes no parameters.
+
+## import-person
+
+Creates a contact, or merges into an existing one with the same id.
+
+| Parameter | Type | Required | Description |
+| --- | --- | --- | --- |
+| `name` | string | yes | Full name |
+| `id` | string | no | Defaults to a slug of the name, such as `ada-example` |
+| `company` | string | no | Current company; `unknown` on a new record if omitted |
+| `role` | string | no | Current role; `unknown` on a new record if omitted |
+| `linkedin` | string | no | LinkedIn profile URL |
+| `x` | string | no | X profile URL or handle |
+| `tracked` | boolean | no | Flag the contact for `list-tracked` |
+| `note` | string | no | Your standing note on who this person is to you; replaces the old one |
+| `notes` | string[] | no | Entries to append; duplicates are skipped |
+
+On a merge, only the fields you pass change and notes are appended, so nothing
+already stored is lost. Returns `imported:` or `updated:` followed by the
+record.
+
+## log-interaction
+
+Appends one dated entry to a contact's notes.
+
+| Parameter | Type | Required | Description |
+| --- | --- | --- | --- |
+| `id` | string | yes | The contact's id |
+| `note` | string | yes | What happened, without the date |
+| `date` | string | no | `YYYY-MM-DD`; defaults to today |
+
+Returns `logged:` followed by the record, or `no contact with id '<id>' —
+import-person first`.

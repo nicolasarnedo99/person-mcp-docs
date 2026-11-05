@@ -1,0 +1,92 @@
+---
+title: Quickstart
+description: Run person-mcp locally, connect it to Claude Code, and get your first answer from the store in about five minutes.
+---
+
+By the end of this page, person-mcp runs on your machine, Claude Code can call
+its tools, and your agent answers a question from a sample contact.
+
+## Before you begin
+
+- Node.js 22.22.2 or newer (`node -v` to check)
+- Git
+- [Claude Code](https://docs.anthropic.com/en/docs/claude-code), or another MCP
+  client that supports HTTP servers
+
+<Steps>
+  <Step title="Clone and install">
+    ```bash
+    git clone https://github.com/nicolasarnedo99/person-mcp.git
+    cd person-mcp
+    npm install
+    ```
+  </Step>
+  <Step title="Create your store">
+    Copy the sample file. It holds one example contact, Jane Doe, so you can
+    test the tools before you add real people.
+
+    ```bash
+    cp people.example.json people.json
+    ```
+
+    `people.json` is gitignored. Keep it that way: it will hold private notes
+    about real people.
+  </Step>
+  <Step title="Start the server">
+    ```bash
+    npm run dev
+    ```
+
+    When it is ready, the terminal prints:
+
+    ```text
+    [mcp-use] dev server ready
+      ➜ MCP endpoint:  http://localhost:3000/mcp
+      ➜ Inspector:     http://localhost:3000/mcp/inspector
+    ```
+
+    Leave this terminal open. The server reads `people.json` from the
+    directory you start it in.
+  </Step>
+  <Step title="Connect Claude Code">
+    In a second terminal, register the server once for your user:
+
+    ```bash
+    claude mcp add person-mcp --transport http http://localhost:3000/mcp --scope user
+    ```
+
+    Start a new Claude Code session so it loads the tools.
+  </Step>
+  <Step title="Ask your first question">
+    In Claude Code, ask:
+
+    ```text
+    What do I know about Jane Doe?
+    ```
+
+    Claude calls `search-people` and `get-person` and answers with her role,
+    company and two dated notes: that you met at a conference and sent a
+    follow-up with a demo link.
+  </Step>
+</Steps>
+
+## Check it without an agent
+
+If you want to confirm the server works before involving a client, call it
+directly. This lists the five tools:
+
+```bash
+curl -s -X POST http://localhost:3000/mcp \
+  -H 'content-type: application/json' \
+  -H 'accept: application/json, text/event-stream' \
+  -d '{"jsonrpc":"2.0","id":1,"method":"tools/list"}'
+```
+
+You can also open the Inspector at `http://localhost:3000/mcp/inspector` and
+run each tool by hand.
+
+## Next step
+
+Now replace the sample with a real contact. [Prepare for a call with
+person-mcp](/guides/prep-before-a-call) shows the full import, log and recall
+loop.
